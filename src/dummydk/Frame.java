@@ -12,21 +12,17 @@ public class Frame extends JFrame implements KeyListener {
 	 */
 	private Frame() {
 		
-		/* Fenster erzeugen und Fenstereigenschaften definieren. */		
+		/* TODO Fenster erzeugen und Fenstereigenschaften definieren. */		
 	}
-
-	/**
-	 * Surpresses eclipse warning
-	 */
-	private static final long serialVersionUID = 8830642345790496618L;
 
 	/**
 	 * Startet das Programm
 	 * @param args wird nicht verwendet
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		
+		/* Programm starten */
+		new Frame();
 	}
 
 	/*
@@ -34,20 +30,14 @@ public class Frame extends JFrame implements KeyListener {
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
 	@Override
-	public void keyPressed(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void keyPressed(KeyEvent arg0) {}
 
 	/*
 	 * (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void keyReleased(KeyEvent arg0) {}
 
 	/*
 	 * (non-Javadoc)
@@ -55,7 +45,8 @@ public class Frame extends JFrame implements KeyListener {
 	 */
 	@Override
 	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+		
+		/* TODO Tastendruck an das Spielfeld weitergeben. */
 		
 	}
 
