@@ -97,5 +97,14 @@ public class Spiel {
 			spielfelder[aktSpielfeld].aktion(alleSpieler.get(0), key);
 		}
 	}
+	
+	/**
+	 * Gibt das aktuelle Spielfeld zurück.
+	 * @return Das aktuelle Spielfeld
+	 */
+	public Spielfeld getAktuellesSpielfeld() {
+		
+		return spielfelder[aktSpielfeld];
+	}
 
 }

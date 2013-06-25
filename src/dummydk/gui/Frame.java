@@ -7,6 +7,7 @@ import java.io.File;
 import javax.swing.JFrame;
 
 import dummydk.controller.Spiel;
+import dummydk.controller.Spielfeld;
 
 /**
  * Repräsentiert ein Swing-Fenster, welches das Programm enthält.
@@ -31,7 +32,7 @@ public class Frame extends JFrame implements KeyListener {
 	public void starteSpiel(File textDatei) {
 		
 		/* Die Datei wird dem neuen Spiel übergeben. */
-		spiel = new Spiel(ANZ_LEVEL, textDatei);
+		this.spiel = new Spiel(ANZ_LEVEL, textDatei);
 	}
 
 	/**
@@ -42,6 +43,11 @@ public class Frame extends JFrame implements KeyListener {
 		
 		/* Programm starten */
 		new Frame();
+	}
+	
+	private void zeichnen(Spielfeld spielfeld) {
+		
+		
 	}
 
 	/*
@@ -66,8 +72,10 @@ public class Frame extends JFrame implements KeyListener {
 	public void keyTyped(KeyEvent arg0) {
 		
 		/* TODO Tastendruck an das Spielfeld weitergeben. */
-		spiel.aktion(arg0.getKeyChar());
+		this.spiel.aktion(arg0.getKeyChar());
 		
+		/* Nach Durchführung der Aktion Spielfeld neu zeichnen. */
+		this.zeichnen(spiel.getAktuellesSpielfeld());
 	}
 
 }
