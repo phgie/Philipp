@@ -1,110 +1,233 @@
 package dummydk.controller;
 
+import dummydk.gui.Frame;
+import dummydk.model.Spieler;
+import dummydk.model.Spielobjekt;
+
 import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
-import dummydk.model.Gegner;
-import dummydk.model.Item;
-import dummydk.model.Spieler;
-
 /**
- * Repräsentiert ein Spiel, welches aus mehreren Spielfeldern bestehen kann. Ein Spiel wird aus einer Datei erzeugt
- * und besteht solange, bis es entweder gewonnen oder verloren wurde.
+ * Repraesentiert ein Spiel, welches aus mehreren Spielfeldern bestehen kann. Ein
+ * Spiel wird aus einer Datei erzeugt und besteht solange, bis es entweder
+ * gewonnen oder verloren wurde.
  */
 public class Spiel {
-	
-	/** Die Anzahl Räume pro Level. Eleganter wäre es, diese Information direkt aus der Textdatei zu beziehen. 
-	 * Aber so geht es auch. */
+
+	/**
+	 * Die Anzahl Raeume pro Level. Eleganter waere es, diese Information direkt
+	 * aus der Textdatei zu beziehen. Aber so geht es auch.
+	 */
 	private static final int ANZ_RAUM_PRO_LEVEL = 3;
-	
-	/** Alle Spielfelder für das aktuelle Spiel. */
-	private Spielfeld[] spielfelder;
-	
+
+	/** Der Frame, zu dem dieses Spiel gehoert. */
+	private Frame parentFrame;
+
+	/** Alle Spielfelder fuer das aktuelle Spiel. */
+	private ArrayList<Spielfeld> spielfelder;
+
 	/** Zeiger auf das aktuelle Spielfeld, welches gerade bespielt wird. */
 	private int aktSpielfeld;
-	
-	/** Eine Liste aller Spieler, die an diesem Spiel teilnehmen. <Spieler> bedeutet, dass die ArrayList nur 
-	 * Werte des Typs Spieler aufnehmen kann (und keine anderen Datentypen). */
+
+	/**
+	 * Eine Liste aller Spieler, die an diesem Spiel teilnehmen. <Spieler>
+	 * bedeutet, dass die ArrayList nur Werte des Typs Spieler aufnehmen kann
+	 * (und keine anderen Datentypen).
+	 */
 	private ArrayList<Spieler> alleSpieler;
-	
+
 	/**
 	 * Erzeugt ein neues Objekt dieser Klasse
-	 * @param anz_level Die Anzahl der Level für dieses Spiel. Ein Level besteht aus ANZ_RAUM_PRO_LEVEL Räumen.
-	 * @param textDatei Die Textdatei, die die Räume enthält. Diese sollte die richtige Anzahl von Räumen enthalten.
+	 * 
+	 * @param frame
+	 *            Der Frame, zu dem dieses Spiel gehoert.
+	 * @param anzLevel
+	 *            Die Anzahl der Level fuer dieses Spiel. Ein Level besteht aus
+	 *            ANZ_RAUM_PRO_LEVEL Raeumen.
+	 * @param textDatei
+	 *            Die Textdatei, die die Raeume enthaelt. Diese sollte die
+	 *            richtige Anzahl von Raeumen enthalten.
 	 */
-	public Spiel(int anz_level, File textDatei) {
-		
-		/* Erzeugt ein Array, welches Spielfelder beinhaltet. Die jeweiligen Spielfelder werden hier NICHT erzeugt. */
-		spielfelder = new Spielfeld[anz_level];
+	public Spiel(Frame frame, int anzLevel, File textDatei) {
+
+		/* Erzeugt ein Array, welches Spielfelder beinhaltet. */
+		spielfelder = new ArrayList<Spielfeld>();
 		this.erzeugeSpielfelder(textDatei);
-		
-		alleSpieler = new ArrayList();
+
+		/* Noch gibt es kein Spielfeld.. */
+		this.aktSpielfeld = -1;
+
+		alleSpieler = new ArrayList<Spieler>();
 	}
 
 	/**
 	 * Erzeugt alle Spielfelder auf Basis der eingegebenen Datei.
-	 * @param textDatei Die Textdatei, die die Räume enthält. Diese sollte die richtige Anzahl von Räumen enthalten.
+	 * 
+	 * @param textDatei
+	 *            Die Textdatei, die die Raeume enthaelt. Diese sollte die
+	 *            richtige Anzahl von Raeumen enthalten.
 	 */
 	private void erzeugeSpielfelder(File textDatei) {
-		
-		/* Hier sollte natürlich das Einlesen der TextDatei passieren. ;-) */
-		for (int i = 0; i < spielfelder.length; i++) {
-			
-			spielfelder[i] = new Spielfeld();
-			
-			/* Je nach gelesenem Wert in der Datei, werden hier Objekte erzeugt und auf das Spielfeld gesetzt. */
-			/* Neuen Spieler erzeugen. */
-			Spieler neuerSpieler = new Spieler();
-			alleSpieler.add(neuerSpieler);
-			spielfelder[i].setzeSpieler(neuerSpieler, new Point(0,0));
-			
-			/* Neues Item erzeugen, TODO: Eigenschaften setzen. */
-			spielfelder[i].setzeItem(new Item(), new Point(0,0));
-			
-			/* Neuen Gegner erzeugen. TODO: Eigenschaften setzen. */
-			spielfelder[i].setzeGegner(new Gegner(), new Point(0,0));
-			
-			/* TODO: Leerfeld oder andere Felder einfügen. */
+
+		BufferedReader reader = null;
+
+		try {
+
+			/* Datei oeffnen. */
+			reader = new BufferedReader(new FileReader(textDatei));
+		} catch (IOException e) {
+
+			this.parentFrame.zeigeFehler("Einlesefehler",
+					"Fehler beim oeffnen der Datei");
+		}
+
+		String zeile = null;
+
+		try {
+
+			/* Erste Zeile einlesen. */
+			zeile = reader.readLine();
+		} catch (IOException e) {
+
+			this.parentFrame.zeigeFehler("Einlesefehler",
+					"Aus der Datei konnte nicht gelesen werden");
+		}
+
+		/*
+		 * Die erste Zeile der Datei sollte die Groessenangaben fuer jedes
+		 * Spielfeld beinhalten. Anzahl Zeilen = Hoehe, Anzahl Spalten = Breite
+		 */
+		/* TODO: Validierung */
+		int hoehe = zeile.charAt(0);
+		int breite = zeile.charAt(1);
+
+		try {
+
+			/* Naechste Zeile.. */
+			zeile = reader.readLine();
+		} catch (IOException e) {
+
+			this.parentFrame.zeigeFehler("Einlesefehler",
+					"Aus der Datei konnte nicht gelesen werden");
+		}
+
+		/*
+		 * Speichert, in welcher Zeile DES AKTUELLEN SPIELFELDS wir uns
+		 * befinden. Variablen, die fuer mehrere Schleifendurchlaeufe verwendet
+		 * werden muessen ausserhalb der Schleife deklariert werden.
+		 */
+		int zeileNr = 0;
+		Spielfeld spielfeld = null;
+
+		/* Dateiende erreicht? */
+		while (zeile != null) {
+
+			if (zeileNr == 0) {
+
+				/* Erste Zeile, das heisst es kommt ein neues Spielfeld. */
+				spielfeld = new Spielfeld(hoehe, breite);
+			}
+
+			/* Ueber alle Zeichen in der Zeile iterieren. */
+			/* TODO: Validierung */
+			for (int i = 0; i < zeile.length(); i++) {
+
+				int zeichenWert = (int) zeile.charAt(i);
+
+				/* Haben wir auch das richtige Zeichen gelesen? ;-) */
+				System.out.println("erzeugeSpielfelder: Gelesenes Zeichen: "
+						+ zeichenWert);
+
+				/* Das passende Objekt fuer das gelesene Zeichen suchen.. */
+				Spielobjekt obj;
+				switch (zeichenWert) {
+
+				default:
+					obj = new Spieler();
+				}
+
+				/*
+				 * Darauf achten, dass das Objekt die richtige Position bekommt.
+				 * Hier: Zeile, Spalte.
+				 */
+				spielfeld.setzeObjektAnPos(obj, new Point(zeileNr, i));
+			}
+
+			try {
+
+				/* Naechste Zeile.. */
+				zeile = reader.readLine();
+			} catch (IOException e) {
+
+				this.parentFrame.zeigeFehler("Einlesefehler",
+						"Aus der Datei konnte nicht gelesen werden");
+			}
+
+			if (zeile.equals("")) {
+
+				/*
+				 * Leerzeile bedeutet, dass wir fuer dieses Spielfeld fertig
+				 * sind.
+				 */
+				spielfelder.add(spielfeld);
+				zeileNr = 0;
+			}
 		}
 	}
-	
+
 	/**
-	 * Führt eine Aktion, die durch einen Tastendruck initiert wurde, auf dem Spiel aus.
-	 * @param key Die gedrückte Taste
+	 * Fuehrt eine Aktion, die durch einen Tastendruck initiert wurde, auf dem
+	 * Spiel aus.
+	 * 
+	 * @param key
+	 *            Die gedrueckte Taste
 	 */
 	public void aktion(int key) {
-		
-		/* Hier könnte man zwischen Tasten unterscheiden, die für das SPIEL sind (z.B. zum Beenden oder Neustarten)
-		 * und Tasten, die für das SPIELFELD sind (z.B. Bewegung).
+
+		/*
+		 * Hier koennte man zwischen Tasten unterscheiden, die fuer das SPIEL sind
+		 * (z.B. zum Beenden oder Neustarten) und Tasten, die fuer das SPIELFELD
+		 * sind (z.B. Bewegung).
 		 */
-		if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT 
+		if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT
 				|| key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
-			
-			/* TODO: Für jeden Spieler in der Liste aller Spieler (und nicht nur für einen)... */
-			spielfelder[aktSpielfeld].bewege(alleSpieler.get(0), key);
-			
-			/* Falls für jede Bewegung des Spielers auch noch die Gegner bewegt werden sollen... */
-			spielfelder[aktSpielfeld].bewegeAlleGegner();
+
+			/*
+			 * TODO: Fuer welchen Spieler?
+			 */
+			spielfelder.get(aktSpielfeld).bewege(alleSpieler.get(0), key);
+
+			/*
+			 * Falls fuer jede Bewegung des Spielers auch noch die Gegner bewegt
+			 * werden sollen...
+			 */
+			spielfelder.get(aktSpielfeld).bewegeAlleGegner();
 		}
-		
+
 		/* else if (...) */
-		/* Genau so könnte man hier für andere Tasten verfahren. Wird z.B. Leertaste gedrückt,
-		 * weiß das Spiel, dass das die Taste für die Waffe für den ersten Spieler ist und 
-		 * teilt das dem Spielfeld mit. */
+		/*
+		 * Genau so koennte man hier fuer andere Tasten verfahren. Wird z.B.
+		 * Leertaste gedrueckt, weiss das Spiel, dass das die Taste fuer die Waffe
+		 * fuer den ersten Spieler ist und teilt das dem Spielfeld mit.
+		 */
 		{
-			spielfelder[aktSpielfeld].aktion(alleSpieler.get(0), key);
+			spielfelder.get(aktSpielfeld).aktion(alleSpieler.get(0), key);
 		}
 	}
-	
+
 	/**
-	 * Gibt das aktuelle Spielfeld zurück.
+	 * Gibt das aktuelle Spielfeld zurueck.
+	 * 
 	 * @return Das aktuelle Spielfeld
 	 */
 	public Spielfeld getAktuellesSpielfeld() {
-		
-		return spielfelder[aktSpielfeld];
+
+		return spielfelder.get(aktSpielfeld);
 	}
 
 }
