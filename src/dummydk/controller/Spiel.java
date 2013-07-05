@@ -168,10 +168,10 @@ public class Spiel {
 						"Aus der Datei konnte nicht gelesen werden");
 			}
 
-			if (zeile.equals("")) {
+			if (zeile.equals("") || zeile == null) {
 
 				/*
-				 * Leerzeile bedeutet, dass wir fuer dieses Spielfeld fertig
+				 * Leerzeile (oder Dateiende) bedeutet, dass wir fuer dieses Spielfeld fertig
 				 * sind.
 				 */
 				spielfelder.add(spielfeld);
