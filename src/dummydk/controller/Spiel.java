@@ -162,6 +162,7 @@ public class Spiel {
 
 				/* Naechste Zeile.. */
 				zeile = reader.readLine();
+				zeileNr++;
 			} catch (IOException e) {
 
 				this.parentFrame.zeigeFehler("Einlesefehler",
