@@ -41,7 +41,7 @@ public class Frame extends JFrame implements KeyListener {
 	public void starteSpiel(File textDatei) {
 
 		/* Die Datei wird dem neuen Spiel uebergeben. */
-		this.spiel = new Spiel(ANZ_LEVEL, textDatei);
+		this.spiel = new Spiel(this, ANZ_LEVEL, textDatei);
 	}
 
 	/**
