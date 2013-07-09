@@ -230,5 +230,14 @@ public class Spiel {
 
 		return spielfelder.get(aktSpielfeld);
 	}
+	
+	/**
+	 * Liefert alle Spielfelder dieses Spiels zurueck.
+	 * @return Alle Spielfelder dieses Spiels.
+	 */
+	protected ArrayList<Spielfeld> getSpielfelder() {
+		
+		return this.spielfelder;
+	}
 
 }
